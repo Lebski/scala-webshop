@@ -1,7 +1,7 @@
 package models
 
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Json, Writes}
+import play.api.libs.json.{JsPath, Writes}
 
 import scala.collection.mutable
 
@@ -45,4 +45,5 @@ object User {
       (JsPath \ "lastName").write[String] and
       (JsPath \ "language").write[String]
     )(unlift(User.unapply))
+
 }
