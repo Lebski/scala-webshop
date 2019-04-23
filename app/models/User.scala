@@ -4,7 +4,7 @@ import java.time.temporal.TemporalAmount
 
 import scala.collection.mutable
 
-class User(var credentials: Credentials, var firstName: String, var lastName: String, var language: String) {
+class User(var id: String, var credentials: Credentials, var firstName: String, var lastName: String, var language: String) {
 
 
  private var shoppingCart = mutable.Map[Int, Int]()
