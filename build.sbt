@@ -16,4 +16,8 @@ unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/
 
 libraryDependencies += "com.github.t3hnar" %% "scala-bcrypt" % "4.0"
 
+libraryDependencies ++= Seq(
+  "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.0" % "test"
+)
+
       
