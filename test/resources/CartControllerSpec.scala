@@ -1,5 +1,5 @@
 import controllers.{CartController, UserController}
-import models.User
+import models.{User, ShoppingCart}
 import org.scalatestplus.play._
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads.minLength
@@ -43,8 +43,8 @@ class CartControllerSpec extends PlaySpec with Results {
   "GET#Cart" should {
     "return an empty list" in {
       var user: User = users.getUser(postResult.userId)
-      user.addCartItem("TestItem", 5)
-      user.addCartItem("TestItem1", 10)
+      user.shoppingCart.addCartItem("TestItem", 5)
+      user.shoppingCart.addCartItem("TestItem1", 10)
       val result: Future[Result] = controller.GetCart(postResult.userId).apply(FakeRequest())
 
       case class GetResult(val TestItem: Int, val TestItem1: Int)
@@ -56,7 +56,7 @@ class CartControllerSpec extends PlaySpec with Results {
       val getResult: GetResult = contentAsJson(result).as(ResultReads)
       getResult.TestItem mustEqual 5
       getResult.TestItem1 mustEqual 10
-      user.resetCart()
+      user.shoppingCart.resetCart()
     }
   }
 
@@ -77,13 +77,13 @@ class CartControllerSpec extends PlaySpec with Results {
           |}
         """.stripMargin))
       val result: Future[Result] = controller.UpdateCart(postResult.userId).apply(postRequest)
-      user.getCart()("TestProduct") mustEqual 5
-      user.resetCart()
+      user.shoppingCart.getCart()("TestProduct") mustEqual 5
+      user.shoppingCart.resetCart()
     }
     "remove items from shopping cart" in {
       var user: User = users.getUser(postResult.userId)
-      user.addCartItem("TestProduct", 5)
-      user.addCartItem("TestProduct1", 1000)
+      user.shoppingCart.addCartItem("TestProduct", 5)
+      user.shoppingCart.addCartItem("TestProduct1", 1000)
       val postRequest = FakeRequest(POST, "/").withJsonBody(Json.parse(
         """
           |{
@@ -101,14 +101,14 @@ class CartControllerSpec extends PlaySpec with Results {
           |}
         """.stripMargin))
       val result: Future[Result] = controller.UpdateCart(postResult.userId).apply(postRequest)
-      user.getCart()("TestProduct") mustEqual 2
-      user.getCart()("TestProduct1") mustEqual 500
-      user.resetCart()
+      user.shoppingCart.getCart()("TestProduct") mustEqual 2
+      user.shoppingCart.getCart()("TestProduct1") mustEqual 500
+      user.shoppingCart.resetCart()
     }
     "remove an items completely from shopping cart" in {
       var user: User = users.getUser(postResult.userId)
-      user.addCartItem("TestProduct", 5)
-      user.addCartItem("TestProduct1", 5)
+      user.shoppingCart.addCartItem("TestProduct", 5)
+      user.shoppingCart.addCartItem("TestProduct1", 5)
       val postRequest = FakeRequest(POST, "/").withJsonBody(Json.parse(
         """
           |{
@@ -121,9 +121,9 @@ class CartControllerSpec extends PlaySpec with Results {
           |}
         """.stripMargin))
       val result: Future[Result] = controller.UpdateCart(postResult.userId).apply(postRequest)
-      user.getCart() contains "TestProduct" mustBe false
-      user.getCart() contains "TestProduct1" mustBe true
-      user.resetCart()
+      user.shoppingCart.getCart() contains "TestProduct" mustBe false
+      user.shoppingCart.getCart() contains "TestProduct1" mustBe true
+      user.shoppingCart.resetCart()
     }
 
   }
@@ -131,13 +131,13 @@ class CartControllerSpec extends PlaySpec with Results {
   "DELETE#Cart" should {
     "remove all Items from cart" in {
       var user: User = users.getUser(postResult.userId)
-      user.addCartItem("TestProduct", 5)
-      user.addCartItem("TestProduct1", 5)
+      user.shoppingCart.addCartItem("TestProduct", 5)
+      user.shoppingCart.addCartItem("TestProduct1", 5)
       val postRequest = FakeRequest(DELETE, "/")
       val result: Future[Result] = controller.ResetCart(postResult.userId).apply(postRequest)
-      user.getCart() contains "TestProduct" mustBe false
-      user.getCart() contains "TestProduct1" mustBe false
-      user.resetCart()
+      user.shoppingCart.getCart() contains "TestProduct" mustBe false
+      user.shoppingCart.getCart() contains "TestProduct1" mustBe false
+      user.shoppingCart.resetCart()
     }
   }
 

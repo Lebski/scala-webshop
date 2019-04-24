@@ -44,13 +44,13 @@ class CartController @Inject()(cc: ControllerComponents,
 
       for (update <- cartUpdate.updates) {
         update.updateOperation match {
-          case "add" => user.addCartItem(update.productId, update.quantity)
-          case "remove" => user.removeCartItem(update.productId, update.quantity)
-          case "discard" => user.discardCartItem(update.productId)
+          case "add" => user.shoppingCart.addCartItem(update.productId, update.quantity)
+          case "remove" => user.shoppingCart.removeCartItem(update.productId, update.quantity)
+          case "discard" => user.shoppingCart.discardCartItem(update.productId)
         }
       }
 
-      Ok(Json.toJson(user.getCart()))
+      Ok(Json.toJson(user.shoppingCart.getCart()))
     } catch {
       case e: JsResultException => print(e)
         NotAcceptable("Format is not right")
@@ -63,7 +63,7 @@ class CartController @Inject()(cc: ControllerComponents,
   def GetCart(userId: String) = Action { request =>
     try {
       val user: User = users.getUser(userId)
-      Ok(Json.toJson(user.getCart()))
+      Ok(Json.toJson(user.shoppingCart.getCart()))
     } catch {
       case e: Throwable => println(e)
         NotFound("User could not be found")
@@ -73,8 +73,8 @@ class CartController @Inject()(cc: ControllerComponents,
   def ResetCart(userId: String) = Action { request =>
     try {
       val user: User = users.getUser(userId)
-      user.resetCart()
-      Ok(Json.toJson(user.getCart()))
+      user.shoppingCart.resetCart()
+      Ok(Json.toJson(user.shoppingCart.getCart()))
     } catch {
       case e: Throwable => println(e)
         NotFound("User could not be found")
