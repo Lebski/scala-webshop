@@ -72,15 +72,13 @@ class UserController @Inject() (cc: ControllerComponents,
   * ~Update~  > Put
   * ~Delte~   > Delete
   *
-  ** Shopping Cart **
-  * Add > Post
-  * Remove > Post
-  * Empty > Delete
-  *
   ** Credentials **
-  * Update > Put
+  * ~Update~ > Put
   *
   ** Adress **
+  * Update > Put
+  *
+  ** Bank **
   * Update > Put
    */
 
@@ -132,20 +130,19 @@ class UserController @Inject() (cc: ControllerComponents,
   def UpdateUser(userId: String) = Action { request =>
     val json = request.body.asJson.get
     try {
-      val generatedUser = json.as[UpdateUser]
+      val updatedUser = json.as[UpdateUser]
 
       val user: User = users.getUser(userId)
 
-      println(generatedUser)
+      println(updatedUser)
 
-      if (generatedUser.email.isDefined) user.credentials.mail = generatedUser.email.get
-      if (generatedUser.firstName != None) user.firstName = generatedUser.firstName.get
-      if (generatedUser.lastName != None) user.lastName = generatedUser.lastName.get
-      if (generatedUser.language != None) user.language = generatedUser.language.get
-      if (generatedUser.password != None) user.credentials = new Credentials(user.credentials.mail, generatedUser.password.get)
+      if (updatedUser.email.isDefined) user.credentials.mail = updatedUser.email.get
+      if (updatedUser.firstName != None) user.firstName = updatedUser.firstName.get
+      if (updatedUser.lastName != None) user.lastName = updatedUser.lastName.get
+      if (updatedUser.language != None) user.language = updatedUser.language.get
+      if (updatedUser.password != None) user.credentials = new Credentials(user.credentials.mail, updatedUser.password.get)
 
       val aggregatedUser: AggregatedUser = new AggregatedUser(user.id, user, user.address, user.bankAccount, user.credentials.mail)
-      println(aggregatedUser)
 
       val response: String =
         """

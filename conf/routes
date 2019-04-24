@@ -28,6 +28,15 @@ PUT    /users/:userId               controllers.UserController.UpdateUser(userId
 # Delete user with userId
 DELETE    /users/:userId               controllers.UserController.DeleteUser(userId: String)
 
+# Get ShoppingCart
+GET    /users/:userId/cart         controllers.CartController.GetCart(userId: String)
+
+# Add, remove or discard Elements from ShoppingCart
+POST    /users/:userId/cart         controllers.CartController.UpdateCart(userId: String)
+
+# Empty the whole ShoppingCart
+DELETE    /users/:userId/cart         controllers.CartController.ResetCart(userId: String)
+
 
 
       
