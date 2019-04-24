@@ -1,7 +1,6 @@
 package models
 
-import java.util.Date
-import java.util.Calendar
+import java.util.{Calendar, Date}
 
 class Order() {
   val ordered: Date = Calendar.getInstance.getTime

@@ -1,9 +1,6 @@
-import javax.inject.Inject
+import models.User
 import org.scalatestplus.play._
 import services.Users
-import models.User
-
-import scala.collection.mutable
 
 class UserServiceSpec extends PlaySpec {
   "A UserService" must {
@@ -33,8 +30,12 @@ class UserServiceSpec extends PlaySpec {
       val userId: String = users.addNewuser("examplePass", exampleMail, "Max", "Müller", "de")
       val userId1: String = users.addNewuser("examplePass", exampleMail, "Max", "Müller", "de")
       val userIds: Iterable[String] = users.getAllUserIds()
-      userIds.exists(x => {x == userId}) mustBe true
-      userIds.exists(x => {x == userId1}) mustBe true
+      userIds.exists(x => {
+        x == userId
+      }) mustBe true
+      userIds.exists(x => {
+        x == userId1
+      }) mustBe true
     }
 
     "return a List of all Users" in {
@@ -43,8 +44,12 @@ class UserServiceSpec extends PlaySpec {
       val userId: String = users.addNewuser("examplePass", exampleMail, "Max", "Müller", "de")
       val userId1: String = users.addNewuser("examplePass", exampleMail, "Max", "Müller", "de")
       val allUsers: Iterable[User] = users.getAllUsers()
-      allUsers.exists(x => {x.id == userId}) mustBe true
-      allUsers.exists(x => {x.id == userId1}) mustBe true
+      allUsers.exists(x => {
+        x.id == userId
+      }) mustBe true
+      allUsers.exists(x => {
+        x.id == userId1
+      }) mustBe true
     }
 
   }

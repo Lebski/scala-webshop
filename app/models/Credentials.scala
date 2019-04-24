@@ -11,7 +11,7 @@ class Credentials(var mail: String, password: String) {
   var pwHash = password.bcrypt(12)
   var result = password.isBcryptedSafe(pwHash)
 
-  def passValid(password: String): Try[Boolean] ={
+  def passValid(password: String): Try[Boolean] = {
     return password.isBcryptedSafe(pwHash)
   }
 

@@ -2,47 +2,49 @@ package controllers
 
 import javax.inject._
 import models.{Address, BankAccount, Credentials, User}
-import play.api.mvc._
-import play.api.libs.json.{JsPath, JsResultException, Json, Reads, Writes}
-import play.api.libs.json.Reads.minLength
-import services.Users
 import play.api.libs.functional.syntax._
+import play.api.libs.json.Reads.minLength
+import play.api.libs.json._
+import play.api.mvc._
+import services.Users
 
 /**
   * Define CRUD-Actions on the [[Users]] singleton object.
   *
-  * @param cc standard controller components
+  * @param cc    standard controller components
   * @param users All collection of all users in the system
   */
 @Singleton
-class UserController @Inject() (cc: ControllerComponents,
-                                users: Users) extends AbstractController(cc) {
+class UserController @Inject()(cc: ControllerComponents,
+                               users: Users) extends AbstractController(cc) {
 
   case class PostUser(var password: String, var email: String, var firstName: String, var lastName: String, var language: String)
+
   implicit val postUserReads: Reads[PostUser] = (
     (JsPath \ "password").read[String](minLength[String](2)) and
       (JsPath \ "email").read[String](Reads.email) and
       (JsPath \ "firstName").read[String](minLength[String](2)) and
       (JsPath \ "lastName").read[String](minLength[String](2)) and
       (JsPath \ "language").read[String](minLength[String](2))
-    )(PostUser.apply _)
+    ) (PostUser.apply _)
   implicit val postUserWrites: Writes[PostUser] = (
     (JsPath \ "password").write[String] and
       (JsPath \ "email").write[String] and
       (JsPath \ "firstName").write[String] and
       (JsPath \ "lastName").write[String] and
       (JsPath \ "language").write[String]
-    )(unlift(PostUser.unapply))
+    ) (unlift(PostUser.unapply))
 
 
   case class AggregatedUser(val id: String, val user: User, val address: Address, val bankAccount: BankAccount, val mail: String)
+
   implicit val responseUserReads: Reads[AggregatedUser] = (
     (JsPath \ "id").read[String] and
-    (JsPath \ "user").read[User] and
-    (JsPath \ "address").read[Address] and
-    (JsPath \ "bankAccount").read[BankAccount] and
-    (JsPath \ "email").read[String]
-    )(AggregatedUser.apply _)
+      (JsPath \ "user").read[User] and
+      (JsPath \ "address").read[Address] and
+      (JsPath \ "bankAccount").read[BankAccount] and
+      (JsPath \ "email").read[String]
+    ) (AggregatedUser.apply _)
 
   implicit val responseUserWrites: Writes[AggregatedUser] = (
     (JsPath \ "id").write[String] and
@@ -50,16 +52,17 @@ class UserController @Inject() (cc: ControllerComponents,
       (JsPath \ "address").write[Address] and
       (JsPath \ "bankAccount").write[BankAccount] and
       (JsPath \ "email").write[String]
-    )(unlift(AggregatedUser.unapply))
+    ) (unlift(AggregatedUser.unapply))
 
   case class UpdateUser(val password: Option[String], val email: Option[String], var firstName: Option[String], var lastName: Option[String], var language: Option[String])
+
   implicit val updateUserReads: Reads[UpdateUser] = (
     (JsPath \ "password").readNullable[String](minLength[String](2)) and
       (JsPath \ "email").readNullable[String](Reads.email) and
       (JsPath \ "firstName").readNullable[String](minLength[String](2)) and
       (JsPath \ "lastName").readNullable[String](minLength[String](2)) and
       (JsPath \ "language").readNullable[String](minLength[String](2))
-    )(UpdateUser.apply _)
+    ) (UpdateUser.apply _)
 
 
   /* Todo:
@@ -169,7 +172,7 @@ class UserController @Inject() (cc: ControllerComponents,
         users.deleteUser(userId)
         msg = "User deleted"
       } else {
-        msg ="User does not exist"
+        msg = "User does not exist"
       }
       val response: String =
         """
@@ -182,9 +185,9 @@ class UserController @Inject() (cc: ControllerComponents,
       Ok(response.format(userId, msg))
 
     } catch {
-    case e: Throwable => println(e)
-      InternalServerError("Something went wrong")
-  }
+      case e: Throwable => println(e)
+        InternalServerError("Something went wrong")
+    }
   }
 
 }
