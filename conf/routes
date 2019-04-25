@@ -37,6 +37,8 @@ POST    /users/:userId/cart         controllers.CartController.UpdateCart(userId
 # Empty the whole ShoppingCart
 DELETE    /users/:userId/cart         controllers.CartController.ResetCart(userId: String)
 
+POST    /auth                       controllers.AuthController.ClaimToken
+
 
 
       

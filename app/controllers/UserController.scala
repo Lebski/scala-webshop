@@ -64,27 +64,6 @@ class UserController @Inject()(cc: ControllerComponents,
       (JsPath \ "language").readNullable[String](minLength[String](2))
     ) (UpdateUser.apply _)
 
-
-  /* Todo:
-  ** Users **
-  * ~Create~ > Post 200/500
-  * ~Read~ > Get 200/500
-  *
-  * * Users/Id **
-  * ~Read~    > Get
-  * ~Update~  > Put
-  * ~Delte~   > Delete
-  *
-  ** Credentials **
-  * ~Update~ > Put
-  *
-  ** Adress **
-  * Update > Put
-  *
-  ** Bank **
-  * Update > Put
-   */
-
   /**
     * Return all Users
     * GET /users
