@@ -6,6 +6,8 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, JsResultException, Json, Reads}
 import play.api.mvc._
 import services.Users
+import auth.AuthAction
+
 
 
 /**
@@ -16,7 +18,8 @@ import services.Users
   */
 @Singleton
 class CartController @Inject()(cc: ControllerComponents,
-                               users: Users) extends UserController(cc, users) {
+                               users: Users,
+                               authAction: AuthAction) extends UserController(cc, users) {
 
   case class CartElementUpdate(val productId: String, val updateOperation: String, val quantity: Int)
 
@@ -35,7 +38,9 @@ class CartController @Inject()(cc: ControllerComponents,
     ) (PostCartUpdate.apply _)
 
 
-  def UpdateCart(userId: String) = Action { request =>
+  def UpdateCart(userId: String) = authAction { request =>
+
+    if (request.userId != userId) Results.Unauthorized("Wrong user id")
 
     val json = request.body.asJson.get
     try {
@@ -60,7 +65,10 @@ class CartController @Inject()(cc: ControllerComponents,
 
   }
 
-  def GetCart(userId: String) = Action { request =>
+  def GetCart(userId: String) = authAction { request =>
+
+    if (request.userId != userId) Results.Unauthorized("Wrong user id")
+
     try {
       val user: User = users.getUser(userId)
       Ok(Json.toJson(user.shoppingCart.getCart()))
@@ -70,7 +78,10 @@ class CartController @Inject()(cc: ControllerComponents,
     }
   }
 
-  def ResetCart(userId: String) = Action { request =>
+  def ResetCart(userId: String) = authAction { request =>
+
+    if (request.userId != userId) Results.Unauthorized("Wrong user id")
+
     try {
       val user: User = users.getUser(userId)
       user.shoppingCart.resetCart()

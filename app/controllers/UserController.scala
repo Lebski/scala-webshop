@@ -1,5 +1,6 @@
 package controllers
 
+import auth.AuthAction
 import javax.inject._
 import models.{Address, BankAccount, Credentials, User}
 import play.api.libs.functional.syntax._
@@ -16,7 +17,8 @@ import services.Users
   */
 @Singleton
 class UserController @Inject()(cc: ControllerComponents,
-                               users: Users) extends AbstractController(cc) {
+                               users: Users,
+                               authAction: AuthAction) extends AbstractController(cc) {
 
   case class PostUser(var password: String, var email: String, var firstName: String, var lastName: String, var language: String)
 
