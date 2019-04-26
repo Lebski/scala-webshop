@@ -44,7 +44,6 @@ class AuthServiceSpec extends PlaySpec {
       val res = authService.validateToken(jwt)
       res mustBe true
       val (success, userId) = authService.parsingCredentials(jwt)
-      println(success, userId)
     }
   }
 }

@@ -20,11 +20,24 @@ class AuthController @Inject()(cc: ControllerComponents,
                                users: Users,
                                auth: AuthService) extends AbstractController(cc) {
 
+  // Add classes for JWT parsing
+
   case class TokenClaim(userId: String, password: String)
-  implicit val postUserReads: Reads[TokenClaim] = (
+
+  implicit val postTokenReads: Reads[TokenClaim] = (
     (JsPath \ "userId").read[String](minLength[String](2)) and
     (JsPath \ "password").read[String](minLength[String](2))
     ) (TokenClaim.apply _)
+
+  case class PostAdmin(var password: String, var email: String, var firstName: String, var lastName: String, var language: String)
+
+  implicit val postAdminReads: Reads[PostAdmin] = (
+    (JsPath \ "password").read[String](minLength[String](2)) and
+      (JsPath \ "email").read[String](Reads.email) and
+      (JsPath \ "firstName").read[String](minLength[String](2)) and
+      (JsPath \ "lastName").read[String](minLength[String](2)) and
+      (JsPath \ "language").read[String](minLength[String](2))
+    ) (PostAdmin.apply _)
 
   def ClaimToken = Action { request =>
     try {
@@ -56,6 +69,35 @@ class AuthController @Inject()(cc: ControllerComponents,
 
       Ok(response.format(token))
 
+    } catch {
+      case e: JsResultException => print(e)
+        NotAcceptable("Format is not right")
+      case e: Throwable => println(e)
+        InternalServerError("Something went wrong")
+    }
+  }
+
+  /**
+    * Create the admin account
+    * POST /auth/admin
+    */
+  def AddAdmin = Action { request =>
+
+    try {
+      val json = request.body.asJson.get
+      val GeneratedUser = json.as[PostAdmin]
+
+      val userId: String = users.addNewuser(GeneratedUser.password, GeneratedUser.email, GeneratedUser.firstName, GeneratedUser.lastName, GeneratedUser.language)
+
+      val response: String =
+        """
+          |{
+          | "userId": "%s",
+          | "message": "Admin created"
+          |}
+        """.stripMargin
+
+      Ok(response.format(userId))
     } catch {
       case e: JsResultException => print(e)
         NotAcceptable("Format is not right")

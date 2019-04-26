@@ -37,7 +37,11 @@ POST    /users/:userId/cart         controllers.CartController.UpdateCart(userId
 # Empty the whole ShoppingCart
 DELETE    /users/:userId/cart         controllers.CartController.ResetCart(userId: String)
 
+# Claim a JWT
 POST    /auth                       controllers.AuthController.ClaimToken
+
+# Add admin account
+POST    /auth/admin                 controllers.AuthController.AddAdmin
 
 
 

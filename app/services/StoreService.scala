@@ -107,8 +107,6 @@ class Store extends StoreService {
       } else notValid = notValid :+ itemId
     }
 
-    println(notInStock)
-
     if ((notInStock.length != 0) || (notValid.length != 0)){
       return (false, "Not in Stock: %s - Not valid: %s".format(notInStock mkString ", ", notValid mkString ", "))
 

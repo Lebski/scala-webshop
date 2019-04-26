@@ -19,7 +19,7 @@ import auth.AuthAction
 @Singleton
 class CartController @Inject()(cc: ControllerComponents,
                                users: Users,
-                               authAction: AuthAction) extends UserController(cc, users) {
+                               authAction: AuthAction) extends UserController(cc, users, authAction) {
 
   case class CartElementUpdate(val productId: String, val updateOperation: String, val quantity: Int)
 
@@ -40,7 +40,7 @@ class CartController @Inject()(cc: ControllerComponents,
 
   def UpdateCart(userId: String) = authAction { request =>
 
-    if (request.userId != userId) Results.Unauthorized("Wrong user id")
+    if (users.isAdminOrOwner(userId, request.userId)) Results.Unauthorized("Authorized user not valid for this action")
 
     val json = request.body.asJson.get
     try {
@@ -67,7 +67,7 @@ class CartController @Inject()(cc: ControllerComponents,
 
   def GetCart(userId: String) = authAction { request =>
 
-    if (request.userId != userId) Results.Unauthorized("Wrong user id")
+    if (users.isAdminOrOwner(userId, request.userId)) Results.Unauthorized("Authorized user not valid for this action")
 
     try {
       val user: User = users.getUser(userId)
@@ -80,7 +80,7 @@ class CartController @Inject()(cc: ControllerComponents,
 
   def ResetCart(userId: String) = authAction { request =>
 
-    if (request.userId != userId) Results.Unauthorized("Wrong user id")
+    if (users.isAdminOrOwner(userId, request.userId)) Results.Unauthorized("Authorized user not valid for this action")
 
     try {
       val user: User = users.getUser(userId)
