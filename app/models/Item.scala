@@ -1,6 +1,6 @@
 package models
 
-case class Item(id: Int, price: Float, description: String) {
+case class Item(id: String, var price: Double, var description: String) {
 
   var stock = 0
 

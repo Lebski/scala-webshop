@@ -1,22 +1,27 @@
 package controllers
 
+import auth.AuthAction
 import javax.inject._
 import models.{Address, BankAccount, Credentials, User}
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads.minLength
 import play.api.libs.json._
-import play.api.mvc._
+import play.api.mvc.{Results, _}
 import services.Users
 
 /**
   * Define CRUD-Actions on the [[Users]] singleton object.
+  * Uses the [[AuthAction]] authentication.
   *
   * @param cc    standard controller components
   * @param users All collection of all users in the system
   */
 @Singleton
 class UserController @Inject()(cc: ControllerComponents,
-                               users: Users) extends AbstractController(cc) {
+                               users: Users,
+                               authAction: AuthAction) extends AbstractController(cc) {
+
+  // Add classes for JWT parsing
 
   case class PostUser(var password: String, var email: String, var firstName: String, var lastName: String, var language: String)
 
@@ -64,36 +69,23 @@ class UserController @Inject()(cc: ControllerComponents,
       (JsPath \ "language").readNullable[String](minLength[String](2))
     ) (UpdateUser.apply _)
 
-
-  /* Todo:
-  ** Users **
-  * ~Create~ > Post 200/500
-  * ~Read~ > Get 200/500
-  *
-  * * Users/Id **
-  * ~Read~    > Get
-  * ~Update~  > Put
-  * ~Delte~   > Delete
-  *
-  ** Credentials **
-  * ~Update~ > Put
-  *
-  ** Adress **
-  * Update > Put
-  *
-  ** Bank **
-  * Update > Put
-   */
-
   /**
-    * Return all Users
+    * Return all users
     * GET /users
     */
-  def GetUsers = Action {
+  def GetUsers = authAction { request =>
+    if (users.isAdmin(request.userId)) Results.Unauthorized("Authorized user not valid for this action")
+
     Ok(Json.toJson(users.getAllUsers()))
   }
 
-  def PostUsers = Action { request =>
+  /**
+    * Create a new user
+    * POST /users
+    */
+  def PostUsers = authAction { request =>
+    if (users.isAdmin(request.userId)) Results.Unauthorized("Authorized user not valid for this action")
+
     try {
       val json = request.body.asJson.get
       val GeneratedUser = json.as[PostUser]
@@ -117,11 +109,17 @@ class UserController @Inject()(cc: ControllerComponents,
     }
   }
 
-  def GetUser(userId: String) = Action {
+  /**
+    * Return a specific user
+    * GET /users/#userid
+    */
+  def GetUser(userId: String) = authAction { request =>
+
+    if (users.isAdminOrOwner(userId, request.userId)) Results.Unauthorized("Authorized user not valid for this action")
+
     try {
       val user: User = users.getUser(userId)
       val aggregatedUser: AggregatedUser = new AggregatedUser(user.id, user, user.address, user.bankAccount, user.credentials.mail)
-      println(aggregatedUser)
       Ok(Json.toJson(aggregatedUser))
 
     } catch {
@@ -130,14 +128,20 @@ class UserController @Inject()(cc: ControllerComponents,
     }
   }
 
-  def UpdateUser(userId: String) = Action { request =>
+  /**
+    * Edit fields of user
+    * PUT /users/#userid
+    */
+  def UpdateUser(userId: String) = authAction { request =>
+
+    if (users.isAdminOrOwner(userId, request.userId)) Results.Unauthorized("Authorized user not valid for this action")
+
+
     val json = request.body.asJson.get
     try {
       val updatedUser = json.as[UpdateUser]
 
       val user: User = users.getUser(userId)
-
-      println(updatedUser)
 
       if (updatedUser.email.isDefined) user.credentials.mail = updatedUser.email.get
       if (updatedUser.firstName != None) user.firstName = updatedUser.firstName.get
@@ -158,14 +162,21 @@ class UserController @Inject()(cc: ControllerComponents,
       Ok(response.format(Json.toJson(aggregatedUser)))
 
     } catch {
-      case e: JsResultException => print(e)
+      case e: JsResultException => println(e)
         NotAcceptable("Format is not right")
       case e: Throwable => println(e)
         NotFound("User could not be found")
     }
   }
 
-  def DeleteUser(userId: String) = Action { request =>
+  /**
+    * Delete user
+    * DELETE /users/#userid
+    */
+  def DeleteUser(userId: String) = authAction { request =>
+
+    if (users.isAdminOrOwner(userId, request.userId)) Results.Unauthorized("Authorized user not valid for this action")
+
     try {
       var msg: String = ""
       if (users.userExists(userId)) {
@@ -191,4 +202,6 @@ class UserController @Inject()(cc: ControllerComponents,
   }
 
 }
+
+
 
