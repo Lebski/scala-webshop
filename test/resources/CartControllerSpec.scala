@@ -1,10 +1,8 @@
-import controllers.{CartController, UserController}
 import auth.{AuthAction, AuthService}
-import javax.inject.Inject
-import models.{ShoppingCart, User}
+import controllers.CartController
+import models.User
 import org.scalatestplus.play._
 import play.api.libs.functional.syntax._
-import play.api.libs.json.Reads.minLength
 import play.api.libs.json.{JsPath, Json, Reads}
 import play.api.mvc._
 import play.api.test.Helpers._
@@ -33,7 +31,7 @@ class CartControllerSpec extends PlaySpec with Results {
   val (_, adminId) = users.addAdmin("test", "test", "test", "test", "test")
   var (_, token) = authService.validateUser(adminId, "test")
 
-  val testRequest =  FakeRequest().withHeaders(AUTHORIZATION -> token)
+  val testRequest = FakeRequest().withHeaders(AUTHORIZATION -> token)
 
   // Setup inital User
 

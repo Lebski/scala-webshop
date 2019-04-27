@@ -1,20 +1,15 @@
 import auth.{AuthAction, AuthService}
 import controllers.UserController
-import javax.inject.Inject
 import org.scalatestplus.play._
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads.minLength
 import play.api.libs.json.{JsPath, Json, Reads}
 import play.api.mvc._
-import play.api.mvc.BodyParsers
 import play.api.test.Helpers._
 import play.api.test._
 import services.Users
-import org.scalatest.mockito.MockitoSugar
-import org.mockito.Mockito._
 
-
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class UserControllerSpec extends PlaySpec with Results {
 
@@ -33,8 +28,7 @@ class UserControllerSpec extends PlaySpec with Results {
   val (_, adminId) = users.addAdmin("test", "test", "test", "test", "test")
   var (_, token) = authService.validateUser(adminId, "test")
 
-  val testRequest =  FakeRequest().withHeaders(AUTHORIZATION -> token)
-
+  val testRequest = FakeRequest().withHeaders(AUTHORIZATION -> token)
 
 
   "GET#Users" should {

@@ -1,23 +1,32 @@
 package services
 
-import models.{Item, ShoppingCart, User}
+import java.util.UUID.randomUUID
+
 import javax.inject._
+import models.{Item, ShoppingCart, User}
+
 import scala.collection.mutable
 
 
-import scala.collection.mutable
+trait StoreService {
+  def AddItem(price: Double, description: String): Item
 
-
-trait StoreService{
-  def AddItem(item: Item)
   def GetItem(id: String): Item
-  def UpdateItem(item: Item)
-  def DeleteItem(item: Item)
+
+  def UpdateItem(itemId: String, price: Double, description: String)
+
+  def DeleteItem(itemId: String)
+
   def DecreaseStock(itemId: String, amount: Int)
+
   def IncreaseStock(itemId: String, amount: Int)
+
   def CalcPrice(cart: ShoppingCart): Double
-  def Checkout(user: User, cart: ShoppingCart): (Boolean, String)
+
+  def Checkout(user: User): (Boolean, String)
+
   def WaresExist(id: String): Boolean
+
   def GetWares(): mutable.Map[String, Item]
 }
 
@@ -25,37 +34,39 @@ trait StoreService{
 class Store extends StoreService {
   private var wares = mutable.Map[String, Item]()
 
-
   @throws(classOf[Exception])
-  override def AddItem(item: Item) {
-    if (!WaresExist(item.id)) {
-      wares += (item.id -> item)
-    } else {
-      throw new Exception("Item already exists")
-    }
-  }
-
-  @throws(classOf[Exception])
-  override def GetItem(id: String): Item ={
-    if (WaresExist(id)){
+  override def GetItem(id: String): Item = {
+    if (WaresExist(id)) {
       return wares(id)
     }
     throw new Exception("User not found")
   }
 
-
-  override def UpdateItem(item: Item) {
-    if (!WaresExist(item.id)) {
-      AddItem(item)
+  @throws(classOf[Exception])
+  override def UpdateItem(itemId: String, price: Double, description: String) {
+    if (WaresExist(itemId)) {
+      wares(itemId).description = description
+      wares(itemId).price = price
     } else {
-      wares(item.id).description = item.description
-      wares(item.id).price = item.price
+      throw new Exception("Item does not exist")
     }
   }
 
-  override def DeleteItem(item: Item) {
-    if (WaresExist(item.id)) {
-      wares -= item.id
+  @throws(classOf[Exception])
+  override def AddItem(price: Double, description: String): Item = {
+    val id = randomUUID().toString
+    if (!WaresExist(id)) {
+      val item: Item = new Item(id, price, description)
+      wares += (item.id -> item)
+      return item
+    } else {
+      throw new Exception("Item already exists")
+    }
+  }
+
+  override def DeleteItem(itemId: String) {
+    if (WaresExist(itemId)) {
+      wares -= itemId
     }
   }
 
@@ -76,15 +87,15 @@ class Store extends StoreService {
     if (WaresExist(itemId)) {
       wares(itemId).stock += amount
     } else {
-    throw new Exception("Item does not exist")
-  }
+      throw new Exception("Item does not exist")
+    }
   }
 
   override def CalcPrice(cart: ShoppingCart): Double = {
     var price: Double = 0
-    for (product <- cart.getCart()){
+    for (product <- cart.getCart()) {
       if (WaresExist(product._1)) {
-      price += wares(product._1).price * product._2
+        price += wares(product._1).price * product._2
       } else {
         throw new Exception("Item does not exist")
       }
@@ -92,11 +103,12 @@ class Store extends StoreService {
     return price
   }
 
-  override def Checkout(user: User, cart: ShoppingCart): (Boolean, String) ={
+  override def Checkout(user: User): (Boolean, String) = {
+    val cart: ShoppingCart = user.shoppingCart
     var price: Double = 0
     var notInStock: List[String] = List.empty[String]
     var notValid: List[String] = List.empty[String]
-    for (product <- cart.getCart()){
+    for (product <- cart.getCart()) {
       val itemId: String = product._1
       price += wares(product._1).price * product._2
 
@@ -107,7 +119,7 @@ class Store extends StoreService {
       } else notValid = notValid :+ itemId
     }
 
-    if ((notInStock.length != 0) || (notValid.length != 0)){
+    if ((notInStock.length != 0) || (notValid.length != 0)) {
       return (false, "Not in Stock: %s - Not valid: %s".format(notInStock mkString ", ", notValid mkString ", "))
 
     } else {
@@ -115,13 +127,14 @@ class Store extends StoreService {
         val itemId: String = product._1
         wares(itemId).stock -= product._2
       }
+      user.shoppingCart.resetCart()
       return (true, "Checkout successful")
     }
 
   }
 
-  override def WaresExist(id: String): Boolean ={
-    wares contains(id)
+  override def WaresExist(id: String): Boolean = {
+    wares contains (id)
   }
 
   override def GetWares(): mutable.Map[String, Item] = {
