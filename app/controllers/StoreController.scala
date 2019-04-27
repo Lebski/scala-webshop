@@ -6,7 +6,7 @@ import models.User
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, JsResultException, Json, Reads}
 import play.api.mvc._
-import services.{Store, Users}
+import services.{Orders, Store, Users}
 
 
 /**
@@ -19,7 +19,8 @@ import services.{Store, Users}
 class StoreController @Inject()(cc: ControllerComponents,
                                 users: Users,
                                 store: Store,
-                                authAction: AuthAction) extends UserController(cc, users, authAction) {
+                                authAction: AuthAction,
+                                orders: Orders) extends UserController(cc, users, authAction) {
 
   // Update and delete elements
 
@@ -56,7 +57,10 @@ class StoreController @Inject()(cc: ControllerComponents,
       (JsPath \ "info").read[String]
     ) (PostStockUpdateOp.apply _)
 
-
+  /**
+    * Add, update or delete items from warehouse
+    * POST /warehouse
+    */
   def UpdateStore() = authAction { request =>
 
     if (users.isAdmin(request.userId)) Results.Unauthorized("Authorized user not valid for this action")
@@ -105,7 +109,10 @@ class StoreController @Inject()(cc: ControllerComponents,
 
   }
 
-
+  /**
+    * List all wares from warehouse
+    * GET /warehouse
+    */
   def GetStore() = authAction { request =>
 
     if (users.isAdmin(request.userId)) Results.Unauthorized("Authorized user not valid for this action")
@@ -119,6 +126,10 @@ class StoreController @Inject()(cc: ControllerComponents,
     }
   }
 
+  /**
+    * Get single item
+    * GET /warehouse/item
+    */
   def GetItem(itemId: String) = authAction { request =>
 
     if (users.isAdmin(request.userId)) Results.Unauthorized("Authorized user not valid for this action")
@@ -295,13 +306,17 @@ class StoreController @Inject()(cc: ControllerComponents,
   def Checkout(userId: String) = authAction { request =>
     if (users.isAdminOrOwner(userId, request.userId)) Results.Unauthorized("Authorized user not valid for this action")
     try {
+
+
       val user: User = users.getUser(userId)
+
       val (success, info) = store.Checkout(user)
+
 
       val response: String =
         """
           |{
-          | "info": "%s",
+          | "order": "%s",
           | "successful": "%b"
           |}
         """.stripMargin

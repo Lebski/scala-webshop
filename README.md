@@ -18,9 +18,11 @@ Adds an inital admin account. Only executable once.
 
 *Response:*
 ```json
+
 {
- "userId": "b36b7e26-d314-4f50-a8f2-bb7815b601fb",
- "message": "Admin created"
+ "userId": "c781a92e-8c6b-48c9-9f81-c1d175168e20",
+ "message": "Admin created",
+ "success": true
 }
 ```
 
@@ -389,5 +391,73 @@ Checkout user's shopping cart (user or admin)
 {
  "info": "Checkout successful",
  "successful": "true"
+}
+```
+## Orders
+
+
+
+**GET** `/orders`
+
+List all orders (only admin)
+
+*Response*:
+```json
+[
+    {
+        "id": "250e0058-4a4f-4418-8d8c-54a93151ed90",
+        "user": {
+            "id": "267ca2ca-f4c2-47e8-9443-bdb57a37a0cb",
+            "firstName": "UserFirst",
+            "lastName": "UserName",
+            "language": "scala"
+        },
+        "items": {
+            "3770ea1c-489f-467d-8b56-2a4d4232b33a": 1
+        }
+    }, 
+    {
+        "id": "5efe38a4-e304-4530-8d6e-31d5bdb056fa",
+        "user": {
+            "id": "267ca2ca-f4c2-47e8-9443-bdb57a37a0cb",
+            "firstName": "UserFirst",
+            "lastName": "UserName",
+            "language": "scala"
+         },
+        "items": {
+            "3770ea1c-489f-467d-8b56-2a4d4232b33a": 2
+        }
+    }
+]
+```
+
+**GET** `/orders/#orderId`
+
+Get order by id (only admin)
+
+*Response:*
+```json
+{
+ "id": "5efe38a4-e304-4530-8d6e-31d5bdb056fa",
+ "user": {
+     "id": "267ca2ca-f4c2-47e8-9443-bdb57a37a0cb",
+     "firstName": "UserFirst",
+     "lastName": "UserName",
+     "language": "scala"
+  },
+ "items": {
+     "3770ea1c-489f-467d-8b56-2a4d4232b33a": 2
+ }
+}
+```
+
+**DELETE** `/orders/#orderId`
+
+Delete order by id (only admin)
+
+*Response:*
+```json
+{
+ "deleted": "250e0058-4a4f-4418-8d8c-54a93151ed90"
 }
 ```

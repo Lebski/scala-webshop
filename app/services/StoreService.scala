@@ -2,8 +2,11 @@ package services
 
 import java.util.UUID.randomUUID
 
+import auth.AuthAction
 import javax.inject._
-import models.{Item, ShoppingCart, User}
+import models.{Item, Order, ShoppingCart, User}
+import play.api.mvc.ControllerComponents
+import services.Orders
 
 import scala.collection.mutable
 
@@ -31,7 +34,7 @@ trait StoreService {
 }
 
 @Singleton
-class Store extends StoreService {
+class Store @Inject()(orders: Orders)  extends StoreService {
   private var wares = mutable.Map[String, Item]()
 
   @throws(classOf[Exception])
@@ -127,8 +130,11 @@ class Store extends StoreService {
         val itemId: String = product._1
         wares(itemId).stock -= product._2
       }
+
+      val order: Order = orders.AddOrder(user, user.shoppingCart.getCart())
+
       user.shoppingCart.resetCart()
-      return (true, "Checkout successful")
+      return (true, order.id)
     }
 
   }
