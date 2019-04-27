@@ -76,12 +76,12 @@ class StoreController @Inject()(cc: ControllerComponents,
           case "update" => (update.id, update.price, update.description) match {
             case (Some(id), Some(price), Some(description)) => store.UpdateItem(id, price, description)
               updated += 1
-            case _ => NotAcceptable("Format is not right (Add item)")
+            case _ => NotAcceptable("Format is not right (Update item)")
           }
           case "delete" => update.id match {
             case Some(id) => store.DeleteItem(id)
               deleted += 1
-            case _ => NotAcceptable("Format is not right (Add item)")
+            case _ => NotAcceptable("Format is not right (Delete item)")
           }
         }
       }
@@ -130,7 +130,7 @@ class StoreController @Inject()(cc: ControllerComponents,
         """
           |{
           | "id": "%s",
-          | "price": "%d",
+          | "price": "%f",
           | "description": "%s",
           | "stock": "%d"
           |}
@@ -164,7 +164,7 @@ class StoreController @Inject()(cc: ControllerComponents,
         """
           |{
           | "id": "%s",
-          | "price": "%d",
+          | "price": "%f",
           | "description": "%s",
           | "stock": "%d"
           |}
@@ -228,6 +228,8 @@ class StoreController @Inject()(cc: ControllerComponents,
 
           case "decrease" => store.DecreaseStock(update.id, update.amount)
             decreased += 1
+
+          case _ => NotAcceptable("Try to either 'increase' or 'decrease'")
         }
       }
 
@@ -263,7 +265,7 @@ class StoreController @Inject()(cc: ControllerComponents,
         stockInfo = stockInfo :+ (item._1, item._2.description, item._2.stock)
       })
 
-      Ok(Json.toJson(stockElements))
+      Ok(Json.toJson(stockInfo))
     } catch {
       case e: Throwable => println(e)
         NotFound("Internal error. Can't read stock.")
@@ -279,7 +281,7 @@ class StoreController @Inject()(cc: ControllerComponents,
       val response: String =
         """
           |{
-          | "price": "%d",
+          | "price": "%f",
           |}
         """.stripMargin
 

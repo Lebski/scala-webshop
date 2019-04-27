@@ -36,16 +36,18 @@ POST    /users/:userId/cart              controllers.CartController.UpdateCart(u
 DELETE  /users/:userId/cart              controllers.CartController.ResetCart(userId: String)
 
 # Calc price of elements in cart
-GET    /users/:userId/cart/calcprie      controllers.StoreController.CalcPrice(userId: String)
+GET    /users/:userId/cart/calcprice      controllers.StoreController.CalcPrice(userId: String)
 
 # Checkout cart
 +nocsrf
 POST    /users/:userId/cart/checkout     controllers.StoreController.Checkout(userId: String)
 
 # Claim a JWT
++nocsrf
 POST    /auth                            controllers.AuthController.ClaimToken
 
 # Add admin account
++nocsrf
 POST    /auth/admin                      controllers.AuthController.AddAdmin
 
 # Add, update or delte items from       arehouse

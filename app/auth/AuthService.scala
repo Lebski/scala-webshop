@@ -11,7 +11,7 @@ import services.Users
 
 class AuthService @Inject()(users: Users){
 
-  val expirationOffset: Int = 60000 * 10 // Minutes
+  val expirationOffset: Int = 60000 * 100 // Minutes
 
   // WARNING: DO NEVER USE THIS SECRET KEY IN PRODCUTION
   val secretKey = "A7PvVg0iCJJB6559nuPAJEm6cnnPfAKf"

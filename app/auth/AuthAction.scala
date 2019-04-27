@@ -12,7 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 case class UserRequest[A](userId: String, request: Request[A]) extends WrappedRequest[A](request)
 
 // Our custom action implementation
-class AuthAction @Inject()(bodyParser: BodyParser[AnyContent], authService: AuthService)(implicit ec: ExecutionContext)
+class AuthAction @Inject()(bodyParser: BodyParsers.Default, authService: AuthService)(implicit ec: ExecutionContext)
   extends ActionBuilder[UserRequest, AnyContent] {
 
   override def parser: BodyParser[AnyContent] = bodyParser
