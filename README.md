@@ -137,8 +137,29 @@ Update user (admin or user)
 *Response:*
 ```json
 {
- "user": "{"id":"a341116d-5586-422d-aed7-ec73745cc185","user":{"id":"a341116d-5586-422d-aed7-ec73745cc185","firstName":"Changed","lastName":"Changed","language":"java"},"address":{"countryCode":"none","state":"none","city":"none","street":"none","number":0},"bankAccount":{"bankName":"none","iban":"none","bic":"none"},"email":"email@email.de"}",
- "message": "User updated"
+	"user": {
+		"id": "a341116d - 5586 - 422 d - aed7 - ec73745cc185",
+		"user": {
+			"id": "a341116d-5586-422d-aed7-ec73745cc185",
+			"firstName": "Changed",
+			"lastName": "Changed",
+			"language": "java"
+		},
+		"address": {
+			"countryCode": "none",
+			"state": "none",
+			"city": "none",
+			"street": "none",
+			"number": 0
+		},
+		"bankAccount": {
+			"bankName": "none",
+			"iban": "none",
+			"bic": "none"
+		},
+		"email": "email@email.de"
+	},
+	"message": "User updated"
 }
 ```
 
@@ -366,7 +387,7 @@ Checkout user's shopping cart (user or admin)
 *Response:*
 ```json
 {
- "info": "Checkout successful"
+ "info": "Checkout successful",
  "successful": "true"
 }
 ```

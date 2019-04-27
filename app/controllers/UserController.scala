@@ -154,7 +154,7 @@ class UserController @Inject()(cc: ControllerComponents,
       val response: String =
         """
           |{
-          | "user": "%s",
+          | "user": %s,
           | "message": "User updated"
           |}
         """.stripMargin

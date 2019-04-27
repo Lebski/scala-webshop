@@ -301,7 +301,7 @@ class StoreController @Inject()(cc: ControllerComponents,
       val response: String =
         """
           |{
-          | "info": "%s"
+          | "info": "%s",
           | "successful": "%b"
           |}
         """.stripMargin
