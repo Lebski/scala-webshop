@@ -87,17 +87,23 @@ class AuthController @Inject()(cc: ControllerComponents,
       val json = request.body.asJson.get
       val GeneratedUser = json.as[PostAdmin]
 
-      val userId: String = users.addNewuser(GeneratedUser.password, GeneratedUser.email, GeneratedUser.firstName, GeneratedUser.lastName, GeneratedUser.language)
+      val (success, userId) = users.addAdmin(GeneratedUser.password, GeneratedUser.email, GeneratedUser.firstName, GeneratedUser.lastName, GeneratedUser.language)
+
+      var message: String = ""
+
+      if (success) message = "Admin created"
+      else message = "Could not create Admin. Admin exists already."
 
       val response: String =
         """
           |{
           | "userId": "%s",
-          | "message": "Admin created"
+          | "message": "%s,
+          | "success": %b
           |}
         """.stripMargin
 
-      Ok(response.format(userId))
+      Ok(response.format(userId, message, success))
     } catch {
       case e: JsResultException => print(e)
         NotAcceptable("Format is not right")
