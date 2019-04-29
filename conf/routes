@@ -50,7 +50,7 @@ POST    /auth                            controllers.AuthController.ClaimToken
 +nocsrf
 POST    /auth/admin                      controllers.AuthController.AddAdmin
 
-# Add, update or delte items from       arehouse
+# Add, update or delte items from warehouse
 +nocsrf
 POST    /warehouse                       controllers.StoreController.UpdateStore
 
@@ -64,7 +64,7 @@ POST    /warehouse/stock                 controllers.StoreController.UpdateStock
 # Get all elements with stock info
 GET     /warehouse/stock                 controllers.StoreController.GetStock
 
-# Get item with attributes id, des      ription, price and stock
+# Get item with attributes id, description, price and stock
 GET     /warehouse/:itemId                 controllers.StoreController.GetItem(itemId: String)
 
 # Update item in warehouse
@@ -75,3 +75,12 @@ PUT     /warehouse/:itemId                 controllers.StoreController.UpdateIte
 +nocsrf
 DELETE  /warehouse/:itemId                  controllers.StoreController.DeleteItem(itemId: String)
 
+# List orders
+GET     /orders                         controllers.OrderController.GetOrders
+
+# Get order by id
+GET     /orders/:orderId                controllers.OrderController.GetOrder(orderId: String)
+
+# Delete order by id
++nocsrf
+DELETE     /orders/:orderId             controllers.OrderController.DeleteOrder(orderId: String)

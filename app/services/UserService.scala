@@ -31,7 +31,7 @@ trait UserService {
 class Users extends UserService {
   private var users: Map[String, User] = Map()
   private var admins: Map[String, Boolean] = Map()
-  private var adminSet:Boolean = false
+  private var adminSet: Boolean = false
 
   override def addNewuser(password: String, email: String, firstName: String, lastName: String, language: String): String = {
     val id = randomUUID().toString
@@ -107,7 +107,6 @@ class Users extends UserService {
     if (admins contains (requestingUser)) return admins(requestingUser)
     return false
   }
-
 
 
 }

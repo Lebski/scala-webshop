@@ -1,13 +1,12 @@
 package controllers
 
+import auth.AuthService
 import javax.inject._
-import models.{Address, BankAccount, Credentials, User}
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads.minLength
 import play.api.libs.json._
 import play.api.mvc._
 import services.Users
-import auth.AuthService
 
 /**
   * Define CRUD-Actions on the [[Users]] singleton object.
@@ -26,7 +25,7 @@ class AuthController @Inject()(cc: ControllerComponents,
 
   implicit val postTokenReads: Reads[TokenClaim] = (
     (JsPath \ "userId").read[String](minLength[String](2)) and
-    (JsPath \ "password").read[String](minLength[String](2))
+      (JsPath \ "password").read[String](minLength[String](2))
     ) (TokenClaim.apply _)
 
   case class PostAdmin(var password: String, var email: String, var firstName: String, var lastName: String, var language: String)
@@ -49,7 +48,7 @@ class AuthController @Inject()(cc: ControllerComponents,
       var response: String = ""
       if (success) {
 
-          response =
+        response =
           """
             |{
             | "JWT": "%s",
@@ -58,7 +57,7 @@ class AuthController @Inject()(cc: ControllerComponents,
           """.stripMargin
 
       } else {
-         response =
+        response =
           """
             |{
             | "JWT": "%s",
@@ -87,17 +86,23 @@ class AuthController @Inject()(cc: ControllerComponents,
       val json = request.body.asJson.get
       val GeneratedUser = json.as[PostAdmin]
 
-      val userId: String = users.addNewuser(GeneratedUser.password, GeneratedUser.email, GeneratedUser.firstName, GeneratedUser.lastName, GeneratedUser.language)
+      val (success, userId) = users.addAdmin(GeneratedUser.password, GeneratedUser.email, GeneratedUser.firstName, GeneratedUser.lastName, GeneratedUser.language)
+
+      var message: String = ""
+
+      if (success) message = "Admin created"
+      else message = "Could not create Admin. Admin exists already."
 
       val response: String =
         """
           |{
           | "userId": "%s",
-          | "message": "Admin created"
+          | "message": "%s",
+          | "success": %b
           |}
         """.stripMargin
 
-      Ok(response.format(userId))
+      Ok(response.format(userId, message, success))
     } catch {
       case e: JsResultException => print(e)
         NotAcceptable("Format is not right")
