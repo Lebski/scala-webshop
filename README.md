@@ -461,3 +461,16 @@ Delete order by id (only admin)
  "deleted": "250e0058-4a4f-4418-8d8c-54a93151ed90"
 }
 ```
+
+## Testing
+
+For testing please exchange in File `auth/AuthAction.scala` Line 15
+
+```
+class AuthAction @Inject()(bodyParser: BodyParsers.Default, authService: AuthService)(implicit ec: ExecutionContext)
+```
+with 
+```
+class AuthAction @Inject()(bodyParser: BodyParser[AnyContent], authService: AuthService)(implicit ec: ExecutionContext)
+```
+Since  `Helpers.stubControllerComponents()` returns a `BodyParser[play.api.mvc.AnyContent]` instead of `BodyParsers.Default` 
